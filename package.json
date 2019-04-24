@@ -1,0 +1,39 @@
+{
+  "name": "awesome-redux-hook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm run build:umd && npm run build:umd:min",
+    "build:umd": "cross-env NODE_ENV=development webpack src/index.ts -o dist/redux-mini-form.js",
+    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.ts -o dist/redux-mini-form.min.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Anti 996 License Version 1.0",
+  "peerDependencies": {
+    "react": "^16.8.1",
+    "react-redux": "^7.0.2",
+    "redux": "^4.0.1",
+    "redux-saga": "^1.0.0"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-redux": "^7.0.2",
+    "redux": "^4.0.1",
+    "redux-saga": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.14",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.7.0",
+    "awesome-typescript-loader": "^5.2.1",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.1.0",
+    "prettier": "^1.17.0",
+    "typescript": "^3.4.5",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  }
+}
