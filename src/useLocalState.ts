@@ -1,40 +1,41 @@
-import { Reducer, useCallback, useMemo, useRef, useState } from 'react'
+import { Reducer, useCallback, useEffect, useRef, useState } from 'react'
 import { Action } from 'redux'
-import { runSaga, Saga, stdChannel } from 'redux-saga'
+import { runSaga, Saga, stdChannel, Task } from 'redux-saga'
 
 export function useLocalState<State, Actions extends Action>(
   reducer: Reducer<State, Actions>,
   initialState: State
 ) {
   const [state, setState] = useState(initialState)
-  const { current: channel } = useRef(stdChannel<Actions>())
-  const store = useRef(state)
+  const channelRef = useRef(stdChannel<Actions>())
+  const storeRef = useRef(initialState)
+  const taskRef = useRef<Task>()
 
   const dispatch = useCallback(
     (action: Actions) => {
-      const newState = reducer(store.current, action)
-      store.current = newState
+      const newState = reducer(storeRef.current, action)
+      storeRef.current = newState
       setState(newState)
 
-      channel.put(action)
+      channelRef.current.put(action)
 
       return action
     },
     [reducer]
   )
 
+  const sagaOptions = {
+    channel: channelRef.current,
+    dispatch,
+    getState: () => storeRef.current,
+  }
   function useSaga<SA extends Saga>(saga: SA, ...args: Parameters<SA>) {
-    useMemo(() => {
-      runSaga(
-        {
-          context: {},
-          channel,
-          dispatch,
-          getState: () => store.current,
-        },
-        saga,
-        ...args
-      )
+    useEffect(() => {
+      taskRef.current && taskRef.current.cancel()
+      taskRef.current = runSaga(sagaOptions, saga, ...args)
+      return () => {
+        taskRef.current && taskRef.current.cancel()
+      }
     }, [saga, args])
   }
 
