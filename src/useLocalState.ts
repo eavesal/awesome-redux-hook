@@ -1,13 +1,10 @@
 import { Reducer, useCallback, useMemo, useRef, useState } from 'react'
+import { Action } from 'redux'
 import { runSaga, Saga, stdChannel } from 'redux-saga'
 
-interface Action<T = any> {
-  type: T
-}
-
-export function useLocalState<S, Actions extends Action>(
-  reducer: Reducer<S, Actions>,
-  initialState: S
+export function useLocalState<State, Actions extends Action>(
+  reducer: Reducer<State, Actions>,
+  initialState: State
 ) {
   const [state, setState] = useState(initialState)
   const { current: channel } = useRef(stdChannel<Actions>())
@@ -26,25 +23,20 @@ export function useLocalState<S, Actions extends Action>(
     [reducer]
   )
 
-  const useSaga = useCallback(
-    function<SA extends Saga>(saga: SA, ...args: Parameters<SA>) {
-      useMemo(
-        () =>
-          runSaga(
-            {
-              context: {},
-              channel,
-              dispatch,
-              getState: () => store.current,
-            },
-            saga,
-            ...args
-          ),
-        [saga]
+  function useSaga<SA extends Saga>(saga: SA, ...args: Parameters<SA>) {
+    useMemo(() => {
+      runSaga(
+        {
+          context: {},
+          channel,
+          dispatch,
+          getState: () => store.current,
+        },
+        saga,
+        ...args
       )
-    },
-    [dispatch, channel]
-  )
+    }, [saga, args])
+  }
 
   function useAction<T extends any[]>(
     actionCreator: (...args: T) => Actions,
