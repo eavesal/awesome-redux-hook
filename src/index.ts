@@ -1,1 +1,1 @@
-export { useLocalState } from './useLocal'
+export { useLocalState } from './useLocalState'
